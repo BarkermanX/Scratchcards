@@ -39,6 +39,88 @@ foreach (Scratchcard objScratchcard in lstScratchCards)
 Console.WriteLine("Part 1 score is :" + iSum);
 
 
+// Part
+int iNumberScratchCards = lstScratchCards.Count;
+List<CopiedCards> lstNewCardsToProcess = new List<CopiedCards>();
+
+for (int iCard = 0; iCard < lstScratchCards.Count; iCard++)
+{
+    for(int iAddition = 1; iAddition <= lstScratchCards[iCard].NumberMatches; iAddition++)
+    {
+        int iNewCardNumber = iCard + iAddition;
+        if (iNewCardNumber < lstScratchCards.Count)
+        {
+            CopiedCards objCopiedCard = new CopiedCards(lstScratchCards[iNewCardNumber].CardNumber, lstScratchCards[iNewCardNumber].NumberMatches);
+            lstNewCardsToProcess.Add(objCopiedCard);
+        }
+    }
+}
+
+iNumberScratchCards += lstNewCardsToProcess.Count;
+
+List<CopiedCards> lstNewCards = new List<CopiedCards>();
+
+
+int iMinCardNumber = 999999;
+do
+{
+    // clear list of new cards to add new ones for this loop
+    lstNewCards.Clear();
+
+    for (int iCard = 0; iCard < lstNewCardsToProcess.Count; iCard++)
+    {
+        for (int iAddition = 1; iAddition <= lstNewCardsToProcess[iCard].NumberMatches; iAddition++)
+        {
+            int iNewCardNumber = lstNewCardsToProcess[iCard].CardNumber - 1 + iAddition;
+            if (iNewCardNumber < lstScratchCards.Count)
+            {
+                CopiedCards objCopiedCard = new CopiedCards(lstScratchCards[iNewCardNumber].CardNumber, lstScratchCards[iNewCardNumber].NumberMatches);
+                lstNewCards.Add(objCopiedCard);
+
+                if (lstScratchCards[iNewCardNumber].CardNumber < iMinCardNumber)
+                {
+                    iMinCardNumber = lstScratchCards[iNewCardNumber].CardNumber;
+                }
+            }
+        }
+    }
+
+    iNumberScratchCards += lstNewCards.Count;
+
+    // repopulate list of cards to process and add new cards for next loop
+    lstNewCardsToProcess.Clear();
+
+    // Add new cards
+    foreach (var item in lstNewCards)
+    {
+        lstNewCardsToProcess.Add(item);
+    }
+
+} while (lstNewCardsToProcess.Count > 0);
+
+
+Console.WriteLine("Part 1 score is :" + iNumberScratchCards);
+
+
+/// <summary>
+///  Did this the hard way!
+///
+/// Should have just looped around once and increments x records with the matching count and then summed them!
+/// </summary>
+
+
+public class CopiedCards
+{
+    public int CardNumber;
+    public int NumberMatches;
+
+    public CopiedCards(int iCardNumber, int iNumberMatches)
+    {
+        CardNumber = iCardNumber;
+        NumberMatches = iNumberMatches;
+    }
+}
+
 
 
 public class Scratchcard
@@ -47,6 +129,7 @@ public class Scratchcard
     public List<int> WinningNumbers = new List<int>();
     public List<int> YourNumbers = new List<int>();
     public int Score;
+    public int NumberMatches;
 }
 
 
@@ -110,6 +193,7 @@ public static class Helper
 
         // Number of matches
         int iNumberMatches = lstMatchingNumbers.Count;
+        objScratchcard.NumberMatches = iNumberMatches;
 
         int iScore = 0;
 
